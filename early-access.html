@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Early Access — 24Craft Cinema (24CC)</title>
+    <meta name="description" content="24Craft Cinema (24CC) — join global early access.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html" aria-label="24Craft Cinema home">
+                <span class="brand-mark" aria-hidden="true">24CC</span>
+                <span class="brand-name">24Craft Cinema</span>
+            </a>
+
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+                Menu
+            </button>
+
+            <nav id="site-nav" class="site-nav" aria-label="Primary">
+                <a class="nav-link" href="index.html">Home</a>
+                <a class="nav-link" href="platform.html">Platform</a>
+                <a class="nav-link" href="crafts.html">24 Crafts</a>
+                <a class="nav-link" href="tools.html">Tools</a>
+                <a class="nav-link" href="roadmap.html">Roadmap</a>
+                <a class="nav-link is-active" href="early-access.html">Early Access</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" class="site-main" aria-label="24Craft Cinema early access">
+        <section class="section scene-3d" aria-label="Global early access">
+            <div class="container">
+                <div class="panel frame-border">
+                    <span class="timecode">TC 00:00:01:00</span>
+                    <span class="badge-3d">🎬 JOIN THE CREW</span>
+                    <p class="eyebrow">Early access</p>
+                    <h1 class="text-3d">Global Early Access</h1>
+                    <p class="lead">Join the global 24CC community.</p>
+
+                    <form class="form" id="early-access-form" novalidate>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label for="ea-name">Name</label>
+                                <input id="ea-name" name="name" type="text" autocomplete="name" required>
+                            </div>
+                            <div class="field">
+                                <label for="ea-email">Email</label>
+                                <input id="ea-email" name="email" type="email" autocomplete="email" required>
+                            </div>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="field">
+                                <label for="ea-country">Country</label>
+                                <input id="ea-country" name="country" type="text" autocomplete="country-name" required>
+                            </div>
+                            <div class="field">
+                                <label for="ea-role">Role</label>
+                                <input id="ea-role" name="role" type="text" required>
+                            </div>
+                            <div class="field">
+                                <label for="ea-language">Language preference</label>
+                                <input id="ea-language" name="language" type="text" required>
+                            </div>
+                        </div>
+
+                        <button class="button" type="submit">Join the global 24CC community</button>
+                        <p class="form-status" id="early-access-status" role="status" aria-live="polite"></p>
+                        <p class="small">This is a pre-launch signup (demo). Wire it to email/CRM when you’re ready.</p>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-grid">
+                <p class="footer-copy">© 2026 24Craft Cinema</p>
+                <p class="footer-links">
+                    <a href="mailto:contact@24craftcinema.com">contact@24craftcinema.com</a>
+                    <span class="dot" aria-hidden="true">·</span>
+                    <a href="#" aria-label="24CC on LinkedIn">LinkedIn</a>
+                    <span class="dot" aria-hidden="true">·</span>
+                    <a href="#" aria-label="24CC on X">X</a>
+                </p>
+                <p class="footer-tag">Built for world cinema.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="innovation.js"></script>
+</body>
+</html>

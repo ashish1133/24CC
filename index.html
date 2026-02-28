@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24Craft Cinema (24CC)</title>
+    <meta name="description" content="24Craft Cinema (24CC) — a global cinema technology startup building an AI-assisted platform for all 24 crafts of filmmaking.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html" aria-label="24Craft Cinema home">
+                <span class="brand-mark" aria-hidden="true">24CC</span>
+                <span class="brand-name">24Craft Cinema</span>
+            </a>
+
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+                Menu
+            </button>
+
+            <nav id="site-nav" class="site-nav" aria-label="Primary">
+                <a class="nav-link is-active" href="index.html">Home</a>
+                <a class="nav-link" href="platform.html">Platform</a>
+                <a class="nav-link" href="crafts.html">24 Crafts</a>
+                <a class="nav-link" href="tools.html">Tools</a>
+                <a class="nav-link" href="roadmap.html">Roadmap</a>
+                <a class="nav-link" href="early-access.html">Early Access</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" class="site-main" aria-label="24Craft Cinema home">
+        <section class="hero scene-3d" aria-label="Hero">
+            <div class="container hero-grid">
+                <div class="hero-copy">
+                    <span class="timecode">TC 00:00:01:00</span>
+                    <span class="badge-3d">🎬 NOW CASTING — GLOBAL BETA</span>
+                    <p class="eyebrow">Global cinema infrastructure</p>
+                    <h1 class="typewriter text-3d" data-typewriter="24Craft Cinema (24CC)"></h1>
+                    <p class="lead">A global cinema technology startup building an AI-assisted platform for all 24 crafts of filmmaking.</p>
+                    <p class="support">Designed for filmmakers across languages, cultures, and industries.</p>
+
+                    <div class="cta-row" role="group" aria-label="Primary calls to action">
+                        <a class="button" href="early-access.html">Join Global Early Access</a>
+                        <a class="button button-secondary" href="#partnerships">Partner With Us</a>
+                    </div>
+                </div>
+
+                <div class="hero-visual" aria-label="Abstract cinema visual">
+                    <canvas id="particle-canvas" aria-hidden="true"></canvas>
+                    <div class="film-reel" style="top:20px;right:30px;opacity:0.3" aria-hidden="true"></div>
+                    <div class="film-reel" style="bottom:30px;left:20px;opacity:0.2;width:50px;height:50px;animation-duration:12s" aria-hidden="true"></div>
+                    <div class="visual-frame" aria-hidden="true"></div>
+                    <div class="visual-timeline" aria-hidden="true">
+                        <span class="bar b1"></span>
+                        <span class="bar b2"></span>
+                        <span class="bar b3"></span>
+                        <span class="bar b4"></span>
+                        <span class="bar b5"></span>
+                    </div>
+                    <div class="visual-grid" aria-hidden="true"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filmstrip Frame-by-Frame Showcase -->
+        <section class="section" aria-label="Cinema workflow filmstrip">
+            <div class="container">
+                <span class="timecode">TC 00:00:30:00</span>
+                <p class="eyebrow">Frame by Frame</p>
+                <h2 class="text-3d">The Cinema Workflow</h2>
+                <div class="filmstrip" role="list" aria-label="Cinema production stages">
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>01 — SCRIPT</h4>
+                            <p>Story development, screenplay, dialogue</p>
+                        </div>
+                    </div>
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>02 — PRE-PROD</h4>
+                            <p>Storyboard, casting, locations, planning</p>
+                        </div>
+                    </div>
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>03 — DESIGN</h4>
+                            <p>Art direction, costumes, sets, props</p>
+                        </div>
+                    </div>
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>04 — SHOOT</h4>
+                            <p>Cinematography, direction, performance</p>
+                        </div>
+                    </div>
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>05 — SOUND</h4>
+                            <p>Recording, foley, music composition</p>
+                        </div>
+                    </div>
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>06 — EDIT</h4>
+                            <p>Assembly, rough cut, fine cut, final</p>
+                        </div>
+                    </div>
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>07 — VFX</h4>
+                            <p>Visual effects, compositing, CGI</p>
+                        </div>
+                    </div>
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>08 — COLOR</h4>
+                            <p>DI, color grading, look development</p>
+                        </div>
+                    </div>
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>09 — MIX</h4>
+                            <p>Sound mixing, Atmos, mastering</p>
+                        </div>
+                    </div>
+                    <div class="film-frame" role="listitem">
+                        <div class="film-frame-content">
+                            <h4>10 — RELEASE</h4>
+                            <p>Distribution, marketing, festival</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filmstrip transition -->
+        <div class="container">
+            <div class="sprocket-strip" aria-hidden="true">
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+            </div>
+        </div>
+
+        <section class="section" aria-label="Global cinema statement">
+            <div class="container split">
+                <div>
+                    <span class="timecode">TC 00:01:00:00</span>
+                    <h2>Cinema Is Global. Tools Are Not.</h2>
+                </div>
+                <div class="stack">
+                    <p>Filmmaking exists in every culture.</p>
+                    <p>But tools are fragmented, expensive, or language-locked.</p>
+                    <p>Most AI tools ignore cinema craft and real workflow.</p>
+                    <p><strong>24CC is built cinema-first, globally.</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-label="Startup vision">
+            <div class="container split">
+                <div>
+                    <h2>Startup Vision</h2>
+                </div>
+                <div class="stack">
+                    <p><strong>Vision:</strong> To become the global operating system for cinema craft.</p>
+                    <p><strong>Mission:</strong> Reduce friction in filmmaking, respect cultural storytelling, and empower creators worldwide.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section scene-3d" aria-label="Platform highlights">
+            <div class="container">
+                <span class="timecode">TC 00:02:00:00</span>
+                <p class="eyebrow">Platform Highlights</p>
+                <h2 class="text-3d">One Platform. Every Craft.</h2>
+                <div class="grid-4 reveal-stagger" aria-label="Key capabilities">
+                    <article class="card">
+                        <h3>Script &amp; Story</h3>
+                        <p>AI-assisted screenwriting with support for multi-language dialogue, beat sheets, and cultural story structures.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Pre-Production</h3>
+                        <p>Breakdown sheets, shot lists, location scouting tools, and scheduling — all in one workspace.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Production</h3>
+                        <p>On-set collaboration dashboards, continuity tracking, and real-time crew communication.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Post-Production</h3>
+                        <p>Edit-ready timelines, VFX briefs, color-grading references, and sound-design asset management.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-label="Key statistics">
+            <div class="container">
+                <div class="stats-row" aria-label="Stats">
+                    <div class="stat">
+                        <span class="stat-number" data-count="24">0</span>
+                        <span class="stat-label">Cinema Crafts Supported</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" data-count="50" data-suffix="+">0</span>
+                        <span class="stat-label">Languages Planned</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" data-count="6">0</span>
+                        <span class="stat-label">Continents Targeted</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" data-count="1">0</span>
+                        <span class="stat-label">Unified Platform</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section scene-3d" aria-label="24 Crafts at a glance">
+            <div class="container">
+                <div class="panel frame-border">
+                    <span class="timecode">TC 00:03:00:00</span>
+                    <p class="eyebrow">The 24 Crafts</p>
+                    <h2 class="text-3d">Every Craft Has a Place</h2>
+                    <p class="lead">From the page to the screen, 24CC organizes filmmaking into the crafts that matter.</p>
+                    <div class="grid-3" aria-label="Craft categories">
+                        <article class="card">
+                            <h3>Story &amp; Script</h3>
+                            <p>Screenwriting, Story Development, Dialogue Writing</p>
+                        </article>
+                        <article class="card">
+                            <h3>Visual Design</h3>
+                            <p>Cinematography, Production Design, Art Direction, Costume Design</p>
+                        </article>
+                        <article class="card">
+                            <h3>Direction &amp; Performance</h3>
+                            <p>Directing, Acting, Casting, Choreography</p>
+                        </article>
+                        <article class="card">
+                            <h3>Sound &amp; Music</h3>
+                            <p>Music Composition, Sound Design, Sound Mixing, Foley</p>
+                        </article>
+                        <article class="card">
+                            <h3>Editing &amp; Post</h3>
+                            <p>Film Editing, VFX, Color Grading, DI</p>
+                        </article>
+                        <article class="card">
+                            <h3>Production &amp; Business</h3>
+                            <p>Producing, Line Production, Distribution, Marketing</p>
+                        </article>
+                    </div>
+                    <div class="cta-row" style="margin-top:1.5rem;">
+                        <a class="button button-secondary" href="crafts.html">Explore All 24 Crafts &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filmstrip transition -->
+        <div class="container">
+            <div class="sprocket-strip" aria-hidden="true">
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+            </div>
+        </div>
+
+        <section class="section scene-3d" aria-label="AI Technology">
+            <div class="container">
+                <div class="panel tech-panel frame-border">
+                    <span class="timecode">TC 00:05:00:00</span>
+                    <p class="eyebrow">Powered by Innovation</p>
+                    <h2 class="text-3d">The Technology Behind 24CC</h2>
+                    <p class="lead">Cutting-edge AI and cloud infrastructure purpose-built for cinema workflows.</p>
+
+                    <div class="tech-orbit" aria-hidden="true">
+                        <div class="orbit-ring ring-1"></div>
+                        <div class="orbit-ring ring-2"></div>
+                        <div class="orbit-core">AI</div>
+                        <div class="orbit-node n1">NLP</div>
+                        <div class="orbit-node n2">CV</div>
+                        <div class="orbit-node n3">ML</div>
+                        <div class="orbit-node n4">LLM</div>
+                    </div>
+
+                    <div class="grid-3" style="margin-top:2rem;" aria-label="Technology capabilities">
+                        <article class="card tech-card">
+                            <div class="tech-icon" aria-hidden="true">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M12 2a4 4 0 0 0-4 4c0 1.95 1.4 3.58 3.25 3.93"/><path d="M8.56 13a8 8 0 0 0-2.51 2.49"/><path d="M15.44 13a8 8 0 0 1 2.51 2.49"/></svg>
+                            </div>
+                            <h3>Generative AI Engine</h3>
+                            <p>Fine-tuned LLMs for screenwriting, dialogue generation, and story analysis across 50+ languages.</p>
+                        </article>
+                        <article class="card tech-card">
+                            <div class="tech-icon" aria-hidden="true">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m8 21 4-4 4 4"/><path d="M7 10h2m2 0h2m2 0h2"/></svg>
+                            </div>
+                            <h3>Computer Vision</h3>
+                            <p>Scene detection, shot classification, continuity checking, and automated storyboard generation from footage.</p>
+                        </article>
+                        <article class="card tech-card">
+                            <div class="tech-icon" aria-hidden="true">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                            </div>
+                            <h3>Cloud-Native Platform</h3>
+                            <p>Globally distributed infrastructure with edge nodes for low-latency collaboration and real-time sync.</p>
+                        </article>
+                        <article class="card tech-card">
+                            <div class="tech-icon" aria-hidden="true">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4M4.22 4.22l2.83 2.83m9.9 9.9 2.83 2.83M1 12h4m14 0h4M4.22 19.78l2.83-2.83m9.9-9.9 2.83-2.83"/></svg>
+                            </div>
+                            <h3>Smart Automation</h3>
+                            <p>Intelligent scheduling, budget forecasting, and resource allocation powered by predictive ML models.</p>
+                        </article>
+                        <article class="card tech-card">
+                            <div class="tech-icon" aria-hidden="true">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h5l3-9 4 18 3-9h5"/></svg>
+                            </div>
+                            <h3>Real-Time Analytics</h3>
+                            <p>Live dashboards for production progress, cost tracking, and cross-department workflow visibility.</p>
+                        </article>
+                        <article class="card tech-card">
+                            <div class="tech-icon" aria-hidden="true">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </div>
+                            <h3>Enterprise Security</h3>
+                            <p>End-to-end encryption, role-based access, watermarking, and DRM integration for content protection.</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-label="How it works">
+            <div class="container split">
+                <div>
+                    <p class="eyebrow">How it works</p>
+                    <h2>Simple by Design</h2>
+                </div>
+                <div class="stack">
+                    <div class="step-card">
+                        <span class="step-number">01</span>
+                        <div>
+                            <h3>Choose Your Craft</h3>
+                            <p>Pick from 24 crafts — screenwriting, cinematography, editing, VFX, and more. The platform adapts to your role.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <span class="step-number">02</span>
+                        <div>
+                            <h3>Work in Your Language</h3>
+                            <p>Create in your native language with AI that understands cultural storytelling conventions, not just text.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <span class="step-number">03</span>
+                        <div>
+                            <h3>Collaborate Globally</h3>
+                            <p>Share projects across borders. Producers, directors, and editors see the same structured data — no translation chaos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section scene-3d" aria-label="Global industries">
+            <div class="container">
+                <div class="panel frame-border">
+                    <span class="timecode">TC 00:08:00:00</span>
+                    <p class="eyebrow">Global Reach</p>
+                    <h2 class="text-3d">Built for Every Film Industry</h2>
+                    <div class="grid-3" aria-label="Film industries">
+                        <article class="card">
+                            <h3>Hollywood &amp; North America</h3>
+                            <p>Studio-scale workflows, union-aware scheduling, and industry-standard integrations.</p>
+                        </article>
+                        <article class="card">
+                            <h3>Indian Cinema</h3>
+                            <p>Multi-language support for Hindi, Tamil, Telugu, Malayalam, Kannada, and 20+ regional industries.</p>
+                        </article>
+                        <article class="card">
+                            <h3>European Arthouse</h3>
+                            <p>Co-production friendly tools, festival submission pipelines, and multilingual crew management.</p>
+                        </article>
+                        <article class="card">
+                            <h3>East Asian Cinema</h3>
+                            <p>CJK language support, anime/VFX pipelines, and regional distribution integrations.</p>
+                        </article>
+                        <article class="card">
+                            <h3>African Cinema</h3>
+                            <p>Nollywood-ready production tools, mobile-first workflows, and local-language scripting.</p>
+                        </article>
+                        <article class="card">
+                            <h3>Latin American Cinema</h3>
+                            <p>Spanish &amp; Portuguese support, indie-friendly pricing, and regional co-production features.</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filmstrip transition -->
+        <div class="container">
+            <div class="sprocket-strip" aria-hidden="true">
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+            </div>
+        </div>
+
+        <section class="section" aria-label="Call to action">
+            <div class="container">
+                <div class="cta-banner">
+                    <h2>Ready to Build the Future of Cinema?</h2>
+                    <p class="lead">Join filmmakers, studios, and educators from around the world who are shaping 24Craft Cinema.</p>
+                    <div class="cta-row" style="justify-content:center;">
+                        <a class="button" href="early-access.html">Join Early Access</a>
+                        <a class="button button-secondary" href="platform.html">Explore the Platform</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="partnerships" class="section" aria-label="Partnerships and ecosystem">
+            <div class="container">
+                <div class="panel">
+                    <h2>Partnerships &amp; Ecosystem</h2>
+                    <div class="grid-4" aria-label="Future collaborations">
+                        <article class="card">
+                            <h3>Film schools</h3>
+                            <p>Curriculum-aligned craft workflows and tooling.</p>
+                        </article>
+                        <article class="card">
+                            <h3>Studios</h3>
+                            <p>Structured collaboration across departments.</p>
+                        </article>
+                        <article class="card">
+                            <h3>Festivals</h3>
+                            <p>Support creators and global visibility pipelines.</p>
+                        </article>
+                        <article class="card">
+                            <h3>Technology partners</h3>
+                            <p>Integrations across production tools and services.</p>
+                        </article>
+                    </div>
+                    <p class="callout">24CC is built to integrate, not replace.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-grid">
+                <p class="footer-copy">© 2026 24Craft Cinema</p>
+                <p class="footer-links">
+                    <a href="mailto:contact@24craftcinema.com">contact@24craftcinema.com</a>
+                    <span class="dot" aria-hidden="true">·</span>
+                    <a href="#" aria-label="24CC on LinkedIn">LinkedIn</a>
+                    <span class="dot" aria-hidden="true">·</span>
+                    <a href="#" aria-label="24CC on X">X</a>
+                </p>
+                <p class="footer-tag">Built for world cinema.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+    <script src="innovation.js"></script>
+</body>
+</html>
