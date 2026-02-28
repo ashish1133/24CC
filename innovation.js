@@ -1,22 +1,22 @@
 /**
- * innovation.js
+ * innovation.js — PERFORMANCE-OPTIMIZED
  * Interactive & animated features for the 24CC website.
- *  - Custom cursor with glow trail
- *  - Scroll progress indicator
- *  - Enhanced particle constellation canvas
- *  - Typewriter headline
- *  - Scroll-reveal (IntersectionObserver)
- *  - Animated stat counters
- *  - Card 3D tilt + mouse-glow tracking
- *  - 3D parallax on scroll
- *  - Filmstrip auto-scroll
- *  - Magnetic button effect
- *  - Smooth page transitions
+ * 
+ * Perf fixes applied:
+ *  - All scroll/mousemove listeners are passive
+ *  - Cursor trail uses transform instead of top/left (GPU compositing)
+ *  - Particle count reduced; O(n²) loop uses squared distance (no sqrt)
+ *  - Gradient creation removed from particle draw loop
+ *  - Card glow: caches querySelectorAll, uses throttled RAF
+ *  - Filmstrip auto-scroll pauses when offscreen (IntersectionObserver)
+ *  - Mobile: disables cursor, particles, tilt, parallax entirely
+ *  - All interval/RAF loops properly cleaned up or gated
  */
 (() => {
     'use strict';
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
 
     /* ============================
        -1. Cinematic Loading Screen
@@ -31,8 +31,8 @@
         const interval = setInterval(() => {
             step++;
             if (step < nums.length) {
-                countdownEl.textContent = nums[step];
-                barFill.style.width = ((step + 1) / nums.length * 100) + '%';
+                if (countdownEl) countdownEl.textContent = nums[step];
+                if (barFill) barFill.style.width = ((step + 1) / nums.length * 100) + '%';
             }
             if (step >= nums.length) {
                 clearInterval(interval);
@@ -40,7 +40,7 @@
                 setTimeout(() => loaderEl.remove(), 900);
             }
         }, 350);
-        barFill.style.width = '20%';
+        if (barFill) barFill.style.width = '20%';
     } else if (loaderEl) {
         loaderEl.remove();
     }
@@ -55,36 +55,40 @@
             background: linear-gradient(90deg, #f0c040, #7df9ff, #b388ff, #f0c040);
             background-size: 300% 100%;
             animation: progress-gradient 3s linear infinite;
-            width: 0%; transition: width 0.1s linear;
-            box-shadow: 0 0 10px rgba(240,192,64,0.4), 0 0 20px rgba(125,249,255,0.2);
-            pointer-events: none;
+            width: 0%; pointer-events: none;
+            will-change: width;
         `;
         const style = document.createElement('style');
         style.textContent = `@keyframes progress-gradient { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }`;
         document.head.appendChild(style);
         document.body.appendChild(progressBar);
 
+        let progressTicking = false;
         window.addEventListener('scroll', () => {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-            progressBar.style.width = progress + '%';
-        });
+            if (!progressTicking) {
+                requestAnimationFrame(() => {
+                    const scrollTop = window.scrollY;
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    progressBar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+                    progressTicking = false;
+                });
+                progressTicking = true;
+            }
+        }, { passive: true });
     }
 
     /* ============================
        0b. Cinema Projector Cursor
-       Film-frame crosshair + particle trail + click ripple
+       DISABLED on mobile/touch devices
        ============================ */
-    if (!prefersReducedMotion && window.innerWidth > 768) {
-        // --- Build cursor DOM ---
+    if (!prefersReducedMotion && !isMobile && window.innerWidth > 768) {
         const cursorWrap = document.createElement('div');
         cursorWrap.className = 'cc-cursor';
         cursorWrap.innerHTML = '<div class="cc-cursor__ring"></div><div class="cc-cursor__dot"></div>';
         document.body.appendChild(cursorWrap);
 
-        // --- Trail dots (8 particles that follow with staggered delay) ---
-        const TRAIL_COUNT = 8;
+        // Reduced trail count from 8 to 5
+        const TRAIL_COUNT = 5;
         const trailDots = [];
         for (let i = 0; i < TRAIL_COUNT; i++) {
             const dot = document.createElement('div');
@@ -94,31 +98,30 @@
         }
 
         let mx = -100, my = -100;
-        const trailHistory = [];  // stores recent mouse positions
+        // Simpler trail: just lerp to cursor, no history array
+        const trailPositions = [];
+        for (let i = 0; i < TRAIL_COUNT; i++) {
+            trailPositions.push({ x: -100, y: -100 });
+        }
 
-        // --- Mouse tracking ---
         document.addEventListener('mousemove', (e) => {
             mx = e.clientX;
             my = e.clientY;
-            trailHistory.push({ x: mx, y: my, t: performance.now() });
-            // Keep last 60 positions (~1s at 60fps)
-            if (trailHistory.length > 60) trailHistory.shift();
-        });
+        }, { passive: true });
 
-        // --- Hover detection ---
+        // Hover detection
         const INTERACTIVE = 'a, button, .card, .film-frame, .stat, .pill-list li, .craft-group, .roadmap-item, .step-card, .tool-card, input, textarea, select, .nav-link, .button, .badge-3d, .brand';
 
         document.addEventListener('mouseover', (e) => {
             if (e.target.closest(INTERACTIVE)) cursorWrap.classList.add('is-hovering');
-        });
+        }, { passive: true });
         document.addEventListener('mouseout', (e) => {
             if (e.target.closest(INTERACTIVE)) cursorWrap.classList.remove('is-hovering');
-        });
+        }, { passive: true });
 
-        // --- Click ripple ---
+        // Click ripple
         document.addEventListener('mousedown', () => {
             cursorWrap.classList.add('is-clicking');
-            // Spawn ripple
             const ripple = document.createElement('div');
             ripple.className = 'cc-click-ripple';
             ripple.style.left = mx + 'px';
@@ -130,72 +133,48 @@
             cursorWrap.classList.remove('is-clicking');
         });
 
-        // --- Animation loop ---
+        // Animation loop — uses transform instead of left/top for GPU compositing
         function animateCursor() {
-            // Position main cursor
-            cursorWrap.style.left = mx + 'px';
-            cursorWrap.style.top = my + 'px';
+            cursorWrap.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
 
-            // Position trail dots with staggered delay
-            const now = performance.now();
+            // Simple lerp trail (no history array needed)
             for (let i = 0; i < TRAIL_COUNT; i++) {
-                const delay = (i + 1) * 25; // ms behind cursor
-                const targetTime = now - delay;
-
-                // Find closest history point
-                let pos = { x: mx, y: my };
-                for (let j = trailHistory.length - 1; j >= 0; j--) {
-                    if (trailHistory[j].t <= targetTime) {
-                        pos = trailHistory[j];
-                        break;
-                    }
-                }
+                const target = i === 0 ? { x: mx, y: my } : trailPositions[i - 1];
+                const pos = trailPositions[i];
+                pos.x += (target.x - pos.x) * 0.3;
+                pos.y += (target.y - pos.y) * 0.3;
 
                 const dot = trailDots[i];
-                // Smooth lerp towards target
-                dot.x += (pos.x - dot.x) * 0.35;
-                dot.y += (pos.y - dot.y) * 0.35;
-                dot.el.style.left = dot.x + 'px';
-                dot.el.style.top = dot.y + 'px';
-
-                // Opacity & scale fade out along the trail
                 const life = 1 - (i / TRAIL_COUNT);
-                dot.el.style.opacity = life * 0.55;
-                dot.el.style.transform = `translate(-50%, -50%) scale(${0.4 + life * 0.6})`;
-
-                // Alternate gold/cyan colors along trail
-                if (i % 3 === 0) {
-                    dot.el.style.background = `rgba(125,249,255,${life * 0.6})`;
-                    dot.el.style.boxShadow = `0 0 ${4 + life * 4}px rgba(125,249,255,${life * 0.3})`;
-                } else {
-                    dot.el.style.background = `rgba(240,192,64,${life * 0.6})`;
-                    dot.el.style.boxShadow = `0 0 ${4 + life * 4}px rgba(240,192,64,${life * 0.3})`;
-                }
+                dot.el.style.transform = `translate3d(${pos.x - 2}px, ${pos.y - 2}px, 0) scale(${0.4 + life * 0.6})`;
+                dot.el.style.opacity = life * 0.45;
             }
 
             requestAnimationFrame(animateCursor);
         }
         requestAnimationFrame(animateCursor);
 
-        // Hide cursor when leaving window
         document.addEventListener('mouseleave', () => {
             cursorWrap.style.opacity = '0';
             trailDots.forEach(d => d.el.style.opacity = '0');
-        });
+        }, { passive: true });
         document.addEventListener('mouseenter', () => {
             cursorWrap.style.opacity = '1';
-        });
+        }, { passive: true });
     }
 
     /* ============================
-       1. Enhanced Particle Constellation
+       1. Particle Constellation
+       DISABLED on mobile
        ============================ */
     const canvas = document.getElementById('particle-canvas');
-    if (canvas && !prefersReducedMotion) {
+    if (canvas && !prefersReducedMotion && !isMobile) {
         const ctx = canvas.getContext('2d');
         let w, h, particles = [];
-        const PARTICLE_COUNT = 70;
-        const CONNECT_DIST = 130;
+        // Reduced from 70 to 40 particles
+        const PARTICLE_COUNT = 40;
+        const CONNECT_DIST = 120;
+        const CONNECT_DIST_SQ = CONNECT_DIST * CONNECT_DIST; // avoid sqrt in loop
         const SPEED = 0.3;
         let mouseCanvasX = -999, mouseCanvasY = -999;
 
@@ -216,44 +195,44 @@
                     r: Math.random() * 2 + 0.8,
                     alpha: Math.random() * 0.5 + 0.3,
                     pulseOffset: Math.random() * Math.PI * 2,
-                    hueShift: Math.random() > 0.7 // some particles are cyan, most are gold
+                    hueShift: Math.random() > 0.7
                 });
             }
         };
 
-        // Track mouse inside the canvas panel
         canvas.parentElement.addEventListener('mousemove', (e) => {
             const rect = canvas.parentElement.getBoundingClientRect();
             mouseCanvasX = e.clientX - rect.left;
             mouseCanvasY = e.clientY - rect.top;
-        });
+        }, { passive: true });
         canvas.parentElement.addEventListener('mouseleave', () => {
             mouseCanvasX = -999;
             mouseCanvasY = -999;
-        });
+        }, { passive: true });
+
+        // Pre-compute color prefixes to avoid string creation in draw loop
+        const goldColor = 'rgba(240,192,64,';
+        const cyanColor = 'rgba(125,249,255,';
 
         const draw = (time) => {
             ctx.clearRect(0, 0, w, h);
+            const len = particles.length;
 
-            // Lines with gradient alpha
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < CONNECT_DIST) {
-                        const alpha = (1 - dist / CONNECT_DIST) * 0.22;
-                        const gradient = ctx.createLinearGradient(
-                            particles[i].x, particles[i].y,
-                            particles[j].x, particles[j].y
-                        );
-                        gradient.addColorStop(0, `rgba(240,192,64,${alpha})`);
-                        gradient.addColorStop(1, `rgba(125,249,255,${alpha * 0.8})`);
-                        ctx.strokeStyle = gradient;
-                        ctx.lineWidth = 0.7;
+            // Lines — use squared distance, simple strokeStyle (no gradient per line)
+            ctx.lineWidth = 0.6;
+            for (let i = 0; i < len; i++) {
+                const pi = particles[i];
+                for (let j = i + 1; j < len; j++) {
+                    const pj = particles[j];
+                    const dx = pi.x - pj.x;
+                    const dy = pi.y - pj.y;
+                    const distSq = dx * dx + dy * dy;
+                    if (distSq < CONNECT_DIST_SQ) {
+                        const alpha = (1 - distSq / CONNECT_DIST_SQ) * 0.18;
+                        ctx.strokeStyle = goldColor + alpha + ')';
                         ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.moveTo(pi.x, pi.y);
+                        ctx.lineTo(pj.x, pj.y);
                         ctx.stroke();
                     }
                 }
@@ -261,14 +240,17 @@
 
             // Mouse connections
             if (mouseCanvasX > 0) {
-                for (const p of particles) {
+                const MOUSE_DIST = 160;
+                const MOUSE_DIST_SQ = MOUSE_DIST * MOUSE_DIST;
+                ctx.lineWidth = 0.8;
+                for (let i = 0; i < len; i++) {
+                    const p = particles[i];
                     const dx = p.x - mouseCanvasX;
                     const dy = p.y - mouseCanvasY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 180) {
-                        const alpha = (1 - dist / 180) * 0.35;
-                        ctx.strokeStyle = `rgba(125,249,255,${alpha})`;
-                        ctx.lineWidth = 1;
+                    const distSq = dx * dx + dy * dy;
+                    if (distSq < MOUSE_DIST_SQ) {
+                        const alpha = (1 - distSq / MOUSE_DIST_SQ) * 0.3;
+                        ctx.strokeStyle = cyanColor + alpha + ')';
                         ctx.beginPath();
                         ctx.moveTo(mouseCanvasX, mouseCanvasY);
                         ctx.lineTo(p.x, p.y);
@@ -277,56 +259,43 @@
                 }
             }
 
-            // Dots with breathing glow
-            for (const p of particles) {
-                const pulse = Math.sin(time * 0.002 + p.pulseOffset) * 0.3 + 0.7;
+            // Dots
+            const timeFactor = time * 0.002;
+            for (let i = 0; i < len; i++) {
+                const p = particles[i];
+                const pulse = Math.sin(timeFactor + p.pulseOffset) * 0.3 + 0.7;
                 const r = p.r * pulse;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-                if (p.hueShift) {
-                    ctx.fillStyle = `rgba(125,249,255,${p.alpha * pulse})`;
-                } else {
-                    ctx.fillStyle = `rgba(240,192,64,${p.alpha * pulse})`;
-                }
+                ctx.fillStyle = p.hueShift
+                    ? cyanColor + (p.alpha * pulse) + ')'
+                    : goldColor + (p.alpha * pulse) + ')';
                 ctx.fill();
-
-                // Glow
-                if (r > 1.5) {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, r * 3, 0, Math.PI * 2);
-                    ctx.fillStyle = p.hueShift
-                        ? `rgba(125,249,255,${p.alpha * 0.06 * pulse})`
-                        : `rgba(240,192,64,${p.alpha * 0.06 * pulse})`;
-                    ctx.fill();
-                }
             }
         };
 
         const update = () => {
-            for (const p of particles) {
-                // Mouse repulsion
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
                 if (mouseCanvasX > 0) {
                     const dx = p.x - mouseCanvasX;
                     const dy = p.y - mouseCanvasY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 120 && dist > 0) {
+                    const distSq = dx * dx + dy * dy;
+                    if (distSq < 14400 && distSq > 0) { // 120²
+                        const dist = Math.sqrt(distSq);
                         const force = (120 - dist) / 120 * 0.8;
                         p.vx += (dx / dist) * force * 0.05;
                         p.vy += (dy / dist) * force * 0.05;
                     }
                 }
-
-                // Damping
                 p.vx *= 0.998;
                 p.vy *= 0.998;
-
-                // Speed limit
-                const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-                if (speed > 1.5) {
+                const speedSq = p.vx * p.vx + p.vy * p.vy;
+                if (speedSq > 2.25) { // 1.5²
+                    const speed = Math.sqrt(speedSq);
                     p.vx = (p.vx / speed) * 1.5;
                     p.vy = (p.vy / speed) * 1.5;
                 }
-
                 p.x += p.vx;
                 p.y += p.vy;
                 if (p.x < 0 || p.x > w) p.vx *= -1;
@@ -336,9 +305,18 @@
             }
         };
 
+        // Only run animation when canvas is visible
+        let canvasVisible = true;
+        const canvasObserver = new IntersectionObserver((entries) => {
+            canvasVisible = entries[0].isIntersecting;
+        }, { threshold: 0 });
+        canvasObserver.observe(canvas);
+
         const loop = (time) => {
-            update();
-            draw(time);
+            if (canvasVisible) {
+                update();
+                draw(time);
+            }
             requestAnimationFrame(loop);
         };
 
@@ -346,10 +324,15 @@
         createParticles();
         requestAnimationFrame(loop);
 
+        // Debounced resize
+        let resizeTimer;
         window.addEventListener('resize', () => {
-            resize();
-            createParticles();
-        });
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                resize();
+                createParticles();
+            }, 200);
+        }, { passive: true });
     }
 
     /* ============================
@@ -365,7 +348,6 @@
                 i++;
                 setTimeout(type, 60 + Math.random() * 40);
             } else {
-                // Keep cursor blinking for 2s then hide
                 setTimeout(() => twEl.classList.add('done'), 2000);
             }
         };
@@ -381,14 +363,9 @@
        3. Scroll Reveal
        ============================ */
     const revealSections = () => {
-        // Auto-add .reveal to all sections (except hero)
         document.querySelectorAll('.section').forEach(sec => {
-            if (!sec.classList.contains('reveal')) {
-                sec.classList.add('reveal');
-            }
+            if (!sec.classList.contains('reveal')) sec.classList.add('reveal');
         });
-
-        // Add stagger class to grids and stat rows
         document.querySelectorAll('.grid-4, .grid-3, .grid-2, .stats-row, .stack').forEach(el => {
             el.classList.add('reveal-stagger');
         });
@@ -397,13 +374,12 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
-                    // Don't unobserve stagger containers until children animate
                     if (!entry.target.classList.contains('reveal-stagger')) {
                         observer.unobserve(entry.target);
                     }
                 }
             });
-        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 
         document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => observer.observe(el));
     };
@@ -422,20 +398,13 @@
             const suffix = el.getAttribute('data-suffix') || '';
             const duration = 1600;
             const start = performance.now();
-
             const tick = (now) => {
                 const elapsed = now - start;
                 const progress = Math.min(elapsed / duration, 1);
-                // Ease-out cubic
                 const eased = 1 - Math.pow(1 - progress, 3);
-                const current = Math.round(eased * target);
-                el.textContent = current + suffix;
-
-                if (progress < 1) {
-                    requestAnimationFrame(tick);
-                } else {
-                    el.classList.add('counted');
-                }
+                el.textContent = Math.round(eased * target) + suffix;
+                if (progress < 1) requestAnimationFrame(tick);
+                else el.classList.add('counted');
             };
             requestAnimationFrame(tick);
         };
@@ -451,24 +420,22 @@
 
         statEls.forEach(el => statObserver.observe(el));
     } else {
-        // If reduced motion, just set final values immediately
         statEls.forEach(el => {
-            const target = el.getAttribute('data-count') || '0';
-            const suffix = el.getAttribute('data-suffix') || '';
-            el.textContent = target + suffix;
+            el.textContent = (el.getAttribute('data-count') || '0') + (el.getAttribute('data-suffix') || '');
         });
     }
 
     /* ============================
        5. Card Mouse-Glow + 3D Tilt
+       DISABLED on mobile
        ============================ */
-    if (!prefersReducedMotion) {
+    if (!prefersReducedMotion && !isMobile) {
         const tiltEls = document.querySelectorAll('.card, .stat, .step-card, .roadmap-item, .craft-group');
 
         tiltEls.forEach(el => {
             el.addEventListener('mouseenter', () => {
                 el.style.transition = 'transform 0.1s ease-out, border-color 0.3s, background 0.3s, box-shadow 0.3s';
-            });
+            }, { passive: true });
 
             el.addEventListener('mousemove', (e) => {
                 const rect = el.getBoundingClientRect();
@@ -476,99 +443,130 @@
                 const y = e.clientY - rect.top;
                 const cx = rect.width / 2;
                 const cy = rect.height / 2;
-                const rotateY = ((x - cx) / cx) * 8;  // max ±8deg
-                const rotateX = ((cy - y) / cy) * 6;  // max ±6deg
+                const rotateY = ((x - cx) / cx) * 6;  // reduced from 8
+                const rotateX = ((cy - y) / cy) * 4;  // reduced from 6
 
-                el.style.setProperty('--rx', rotateX + 'deg');
-                el.style.setProperty('--ry', rotateY + 'deg');
                 el.style.setProperty('--mouse-x', x + 'px');
                 el.style.setProperty('--mouse-y', y + 'px');
-                el.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
-            });
+                el.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(12px)`;
+            }, { passive: true });
 
             el.addEventListener('mouseleave', () => {
                 el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, background 0.3s, box-shadow 0.3s';
-                el.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0)';
-            });
+                el.style.transform = '';
+            }, { passive: true });
         });
 
-        // Global card glow tracking
+        // Card glow tracking — CACHED querySelectorAll + throttled via RAF
+        const allCards = document.querySelectorAll('.card');
+        let cardGlowTicking = false;
+        let lastCardMouseX = 0, lastCardMouseY = 0;
+
         document.addEventListener('mousemove', (e) => {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.setProperty('--mouse-x', x + 'px');
-                card.style.setProperty('--mouse-y', y + 'px');
-            });
-        });
+            lastCardMouseX = e.clientX;
+            lastCardMouseY = e.clientY;
+            if (!cardGlowTicking) {
+                requestAnimationFrame(() => {
+                    const vh = window.innerHeight;
+                    allCards.forEach(card => {
+                        const rect = card.getBoundingClientRect();
+                        // Only update cards near the viewport
+                        if (rect.bottom > -100 && rect.top < vh + 100) {
+                            card.style.setProperty('--mouse-x', (lastCardMouseX - rect.left) + 'px');
+                            card.style.setProperty('--mouse-y', (lastCardMouseY - rect.top) + 'px');
+                        }
+                    });
+                    cardGlowTicking = false;
+                });
+                cardGlowTicking = true;
+            }
+        }, { passive: true });
     }
 
     /* ============================
        6. 3D Parallax on Scroll
+       DISABLED on mobile
        ============================ */
-    if (!prefersReducedMotion) {
+    if (!prefersReducedMotion && !isMobile) {
         const scenes = document.querySelectorAll('.scene-3d');
-        let ticking = false;
+        let parallaxTicking = false;
 
         window.addEventListener('scroll', () => {
-            if (!ticking) {
+            if (!parallaxTicking) {
                 requestAnimationFrame(() => {
+                    const viewH = window.innerHeight;
                     scenes.forEach(scene => {
                         const rect = scene.getBoundingClientRect();
-                        const viewH = window.innerHeight;
-                        const progress = (viewH - rect.top) / (viewH + rect.height);
-                        const clamped = Math.max(0, Math.min(1, progress));
-                        const rotateX = (0.5 - clamped) * 4; // slight tilt based on scroll position
-                        scene.style.transform = `perspective(1200px) rotateX(${rotateX}deg)`;
+                        if (rect.bottom > 0 && rect.top < viewH) {
+                            const progress = (viewH - rect.top) / (viewH + rect.height);
+                            const clamped = Math.max(0, Math.min(1, progress));
+                            const rotateX = (0.5 - clamped) * 3; // reduced from 4
+                            scene.style.transform = `perspective(1200px) rotateX(${rotateX}deg)`;
+                        }
                     });
-                    ticking = false;
+                    parallaxTicking = false;
                 });
-                ticking = true;
+                parallaxTicking = true;
             }
-        });
+        }, { passive: true });
     }
 
     /* ============================
        7. Filmstrip Auto-Scroll
+       PAUSES when offscreen (IntersectionObserver)
        ============================ */
     const filmstrips = document.querySelectorAll('.filmstrip');
     filmstrips.forEach(strip => {
         let scrollAmount = 0;
         const speed = 0.5;
         let paused = false;
+        let visible = false;
+        let rafId = null;
 
-        strip.addEventListener('mouseenter', () => paused = true);
-        strip.addEventListener('mouseleave', () => paused = false);
+        strip.addEventListener('mouseenter', () => paused = true, { passive: true });
+        strip.addEventListener('mouseleave', () => paused = false, { passive: true });
 
-        function autoScroll() {
-            if (!paused && strip.scrollWidth > strip.clientWidth) {
-                scrollAmount += speed;
-                if (scrollAmount >= strip.scrollWidth - strip.clientWidth) {
-                    scrollAmount = 0;
+        // Only run RAF when strip is visible
+        const obs = new IntersectionObserver((entries) => {
+            visible = entries[0].isIntersecting;
+            if (visible && rafId === null) startScroll();
+        }, { threshold: 0 });
+        obs.observe(strip);
+
+        function startScroll() {
+            function tick() {
+                if (!visible) {
+                    rafId = null;
+                    return;
                 }
-                strip.scrollLeft = scrollAmount;
+                if (!paused && strip.scrollWidth > strip.clientWidth) {
+                    scrollAmount += speed;
+                    if (scrollAmount >= strip.scrollWidth - strip.clientWidth) {
+                        scrollAmount = 0;
+                    }
+                    strip.scrollLeft = scrollAmount;
+                }
+                rafId = requestAnimationFrame(tick);
             }
-            requestAnimationFrame(autoScroll);
+            rafId = requestAnimationFrame(tick);
         }
-        autoScroll();
     });
 
     /* ============================
        8. Magnetic Button Effect
+       DISABLED on mobile
        ============================ */
-    if (!prefersReducedMotion) {
+    if (!prefersReducedMotion && !isMobile) {
         document.querySelectorAll('.button').forEach(btn => {
             btn.addEventListener('mousemove', (e) => {
                 const rect = btn.getBoundingClientRect();
                 const x = e.clientX - rect.left - rect.width / 2;
                 const y = e.clientY - rect.top - rect.height / 2;
-                btn.style.transform = `translateY(-3px) translate(${x * 0.15}px, ${y * 0.15}px) scale(1.02)`;
-            });
+                btn.style.transform = `translate(${x * 0.12}px, ${y * 0.12}px)`;
+            }, { passive: true });
             btn.addEventListener('mouseleave', () => {
                 btn.style.transform = '';
-            });
+            }, { passive: true });
         });
     }
 
@@ -576,7 +574,6 @@
        9. Smooth Reveal for Text
        ============================ */
     if (!prefersReducedMotion) {
-        // Add character-level animation to .text-3d headings on scroll
         const textEls = document.querySelectorAll('.text-3d');
         textEls.forEach(el => {
             const observer = new IntersectionObserver((entries) => {
@@ -593,20 +590,23 @@
     }
 
     /* ============================
-       10. Sprocket Animation
+       10. Sprocket Animation (skip on mobile)
        ============================ */
-    if (!prefersReducedMotion) {
-        document.querySelectorAll('.sprocket-hole').forEach((hole, i) => {
-            hole.style.animation = `sprocket-glow 2s ease-in-out ${i * 0.12}s infinite alternate`;
-        });
-        const sprocketStyle = document.createElement('style');
-        sprocketStyle.textContent = `
-            @keyframes sprocket-glow {
-                0% { border-color: rgba(240,192,64,0.15); box-shadow: none; }
-                100% { border-color: rgba(240,192,64,0.5); box-shadow: 0 0 8px rgba(240,192,64,0.2); }
-            }
-        `;
-        document.head.appendChild(sprocketStyle);
+    if (!prefersReducedMotion && !isMobile) {
+        const holes = document.querySelectorAll('.sprocket-hole');
+        if (holes.length) {
+            const sprocketStyle = document.createElement('style');
+            sprocketStyle.textContent = `
+                @keyframes sprocket-glow {
+                    0% { border-color: rgba(240,192,64,0.15); box-shadow: none; }
+                    100% { border-color: rgba(240,192,64,0.5); box-shadow: 0 0 8px rgba(240,192,64,0.2); }
+                }
+            `;
+            document.head.appendChild(sprocketStyle);
+            holes.forEach((hole, i) => {
+                hole.style.animation = `sprocket-glow 2s ease-in-out ${i * 0.12}s infinite alternate`;
+            });
+        }
     }
 
     /* ============================
@@ -614,13 +614,12 @@
        ============================ */
     if (!prefersReducedMotion) {
         document.body.style.opacity = '0';
-        document.body.style.transition = 'opacity 0.6s ease';
+        document.body.style.transition = 'opacity 0.5s ease';
         window.addEventListener('load', () => {
             requestAnimationFrame(() => {
                 document.body.style.opacity = '1';
             });
         });
-        // Fallback if load already fired
         if (document.readyState === 'complete') {
             document.body.style.opacity = '1';
         }
@@ -628,15 +627,32 @@
 
     /* ============================
        12. Card Spotlight Tracking
+       DISABLED on mobile
        ============================ */
-    if (!prefersReducedMotion) {
-        document.addEventListener('mousemove', (e) => {
-            document.querySelectorAll('.card-spotlight').forEach(card => {
-                const rect = card.getBoundingClientRect();
-                card.style.setProperty('--spotlight-x', (e.clientX - rect.left) + 'px');
-                card.style.setProperty('--spotlight-y', (e.clientY - rect.top) + 'px');
-            });
-        });
+    if (!prefersReducedMotion && !isMobile) {
+        const spotlightCards = document.querySelectorAll('.card-spotlight');
+        if (spotlightCards.length) {
+            let spotTicking = false;
+            let spotMx = 0, spotMy = 0;
+            document.addEventListener('mousemove', (e) => {
+                spotMx = e.clientX;
+                spotMy = e.clientY;
+                if (!spotTicking) {
+                    requestAnimationFrame(() => {
+                        const vh = window.innerHeight;
+                        spotlightCards.forEach(card => {
+                            const rect = card.getBoundingClientRect();
+                            if (rect.bottom > 0 && rect.top < vh) {
+                                card.style.setProperty('--spotlight-x', (spotMx - rect.left) + 'px');
+                                card.style.setProperty('--spotlight-y', (spotMy - rect.top) + 'px');
+                            }
+                        });
+                        spotTicking = false;
+                    });
+                    spotTicking = true;
+                }
+            }, { passive: true });
+        }
     }
 
     /* ============================
@@ -649,11 +665,10 @@
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     document.body.style.opacity = '0';
-                    document.body.style.transform = 'translateY(-10px)';
-                    document.body.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+                    document.body.style.transition = 'opacity 0.25s ease';
                     setTimeout(() => {
                         window.location.href = href;
-                    }, 350);
+                    }, 250);
                 });
             }
         });
@@ -661,18 +676,24 @@
 
     /* ============================
        14. Parallax Background Blobs
+       DISABLED on mobile — uses throttled RAF
        ============================ */
-    if (!prefersReducedMotion) {
+    if (!prefersReducedMotion && !isMobile) {
         let lastScrollY = 0;
-        const body = document.body;
+        let blobTicking = false;
         window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
-            if (Math.abs(scrollY - lastScrollY) > 2) {
-                const shift = scrollY * 0.02;
-                body.style.setProperty('--parallax-shift', shift + 'px');
-                lastScrollY = scrollY;
+            if (!blobTicking) {
+                requestAnimationFrame(() => {
+                    const scrollY = window.scrollY;
+                    if (Math.abs(scrollY - lastScrollY) > 3) {
+                        document.body.style.setProperty('--parallax-shift', (scrollY * 0.02) + 'px');
+                        lastScrollY = scrollY;
+                    }
+                    blobTicking = false;
+                });
+                blobTicking = true;
             }
-        });
+        }, { passive: true });
     }
 
     /* ============================
