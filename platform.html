@@ -11,6 +11,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Cinematic Loading Screen -->
+    <div class="cinema-loader" id="cinema-loader">
+        <div class="loader-reticle" aria-hidden="true"></div>
+        <div class="loader-countdown" id="loader-countdown" aria-hidden="true">5</div>
+        <div class="loader-brand">24Craft Cinema</div>
+        <div class="loader-bar"><div class="loader-bar-fill" id="loader-bar-fill"></div></div>
+    </div>
+
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header">
@@ -41,6 +49,7 @@
                 <div class="panel frame-border">
                     <span class="timecode">TC 00:00:01:00</span>
                     <span class="badge-3d">🎬 PLATFORM OVERVIEW</span>
+                    <span class="float-tag">⚡ AI-POWERED</span>
                     <p class="eyebrow">Platform</p>
                     <h1 class="text-3d">What Is 24Craft Cinema</h1>
                     <p class="lead">24Craft Cinema (24CC) is a film-technology startup creating a unified AI-assisted platform that supports every major craft of cinema — from story development to post-production — for filmmakers worldwide.</p>
@@ -69,6 +78,13 @@
 
         <section class="section scene-3d" aria-label="How the platform will work">
             <div class="container">
+                <!-- Sprocket transition -->
+                <div class="sprocket-strip" aria-hidden="true">
+                    <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                    <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                    <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                    <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
+                </div>
                 <div class="panel frame-border">
                     <span class="timecode">TC 00:02:00:00</span>
                     <h2 class="text-3d">How The Platform Will Work</h2>
@@ -89,7 +105,8 @@
         <section class="section" aria-label="Who it serves">
             <div class="container split">
                 <div>
-                    <h2>Who It Serves</h2>
+                    <span class="timecode">TC 00:04:00:00</span>
+                    <h2 class="neon-gold">Who It Serves</h2>
                 </div>
                 <div class="stack">
                     <ul class="bullets">
@@ -99,7 +116,7 @@
                         <li>Studios &amp; production houses</li>
                         <li>Cross-border co-productions</li>
                     </ul>
-                    <p class="small"><strong>Designed for multilingual cinema from day one.</strong></p>
+                    <p class="small"><strong class="neon-cyan">Designed for multilingual cinema from day one.</strong></p>
                 </div>
             </div>
         </section>

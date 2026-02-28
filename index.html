@@ -11,6 +11,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Cinematic Loading Screen -->
+    <div class="cinema-loader" id="cinema-loader">
+        <div class="loader-reticle" aria-hidden="true"></div>
+        <div class="loader-countdown" id="loader-countdown" aria-hidden="true">5</div>
+        <div class="loader-brand">24Craft Cinema</div>
+        <div class="loader-bar"><div class="loader-bar-fill" id="loader-bar-fill"></div></div>
+    </div>
+
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header">
@@ -41,10 +49,11 @@
                 <div class="hero-copy">
                     <span class="timecode">TC 00:00:01:00</span>
                     <span class="badge-3d">🎬 NOW CASTING — GLOBAL BETA</span>
+                    <span class="float-tag">🌍 50+ LANGUAGES</span>
                     <p class="eyebrow">Global cinema infrastructure</p>
                     <h1 class="typewriter text-3d" data-typewriter="24Craft Cinema (24CC)"></h1>
-                    <p class="lead">A global cinema technology startup building an AI-assisted platform for all 24 crafts of filmmaking.</p>
-                    <p class="support">Designed for filmmakers across languages, cultures, and industries.</p>
+                    <p class="lead">A global cinema technology startup building an AI-assisted platform for all <strong>24 crafts</strong> of filmmaking — powered by AI, built for every culture.</p>
+                    <p class="support">From script to screen. Every craft. Every language. One platform.</p>
 
                     <div class="cta-row" role="group" aria-label="Primary calls to action">
                         <a class="button" href="early-access.html">Join Global Early Access</a>
@@ -54,8 +63,9 @@
 
                 <div class="hero-visual" aria-label="Abstract cinema visual">
                     <canvas id="particle-canvas" aria-hidden="true"></canvas>
-                    <div class="film-reel" style="top:20px;right:30px;opacity:0.3" aria-hidden="true"></div>
-                    <div class="film-reel" style="bottom:30px;left:20px;opacity:0.2;width:50px;height:50px;animation-duration:12s" aria-hidden="true"></div>
+                    <div class="film-reel" style="top:15px;right:25px;opacity:0.35" aria-hidden="true"></div>
+                    <div class="film-reel" style="bottom:25px;left:15px;opacity:0.2;width:55px;height:55px;animation-duration:12s;animation-direction:reverse" aria-hidden="true"></div>
+                    <div class="film-reel" style="top:50%;left:50%;opacity:0.08;width:180px;height:180px;animation-duration:20s;margin:-90px 0 0 -90px" aria-hidden="true"></div>
                     <div class="visual-frame" aria-hidden="true"></div>
                     <div class="visual-timeline" aria-hidden="true">
                         <span class="bar b1"></span>
@@ -68,6 +78,14 @@
                 </div>
             </div>
         </section>
+
+        <!-- Cinema Industry Ticker -->
+        <div class="cinema-ticker" aria-hidden="true">
+            <div class="ticker-track">
+                <span>Screenwriting</span><span>Cinematography</span><span>Direction</span><span>Editing</span><span>VFX</span><span>Sound Design</span><span>Color Grading</span><span>Production Design</span><span>Costume Design</span><span>Music</span><span>Acting</span><span>Casting</span><span>Producing</span><span>Distribution</span><span>Marketing</span><span>Storyboarding</span><span>Foley</span><span>DI</span><span>Location Scouting</span><span>Script Supervision</span><span>Choreography</span><span>Art Direction</span><span>Line Production</span><span>Dubbing</span>
+                <span>Screenwriting</span><span>Cinematography</span><span>Direction</span><span>Editing</span><span>VFX</span><span>Sound Design</span><span>Color Grading</span><span>Production Design</span><span>Costume Design</span><span>Music</span><span>Acting</span><span>Casting</span><span>Producing</span><span>Distribution</span><span>Marketing</span><span>Storyboarding</span><span>Foley</span><span>DI</span><span>Location Scouting</span><span>Script Supervision</span><span>Choreography</span><span>Art Direction</span><span>Line Production</span><span>Dubbing</span>
+            </div>
+        </div>
 
         <!-- Filmstrip Frame-by-Frame Showcase -->
         <section class="section" aria-label="Cinema workflow filmstrip">
@@ -155,13 +173,13 @@
             <div class="container split">
                 <div>
                     <span class="timecode">TC 00:01:00:00</span>
-                    <h2>Cinema Is Global. Tools Are Not.</h2>
+                    <h2 class="neon-gold">Cinema Is Global. Tools Are Not.</h2>
                 </div>
                 <div class="stack">
                     <p>Filmmaking exists in every culture.</p>
                     <p>But tools are fragmented, expensive, or language-locked.</p>
                     <p>Most AI tools ignore cinema craft and real workflow.</p>
-                    <p><strong>24CC is built cinema-first, globally.</strong></p>
+                    <p><strong class="neon-cyan">24CC is built cinema-first, globally.</strong></p>
                 </div>
             </div>
         </section>
@@ -169,11 +187,16 @@
         <section class="section" aria-label="Startup vision">
             <div class="container split">
                 <div>
+                    <span class="timecode">TC 00:01:30:00</span>
                     <h2>Startup Vision</h2>
                 </div>
                 <div class="stack">
-                    <p><strong>Vision:</strong> To become the global operating system for cinema craft.</p>
-                    <p><strong>Mission:</strong> Reduce friction in filmmaking, respect cultural storytelling, and empower creators worldwide.</p>
+                    <div class="feature-box" style="text-align:left;padding:1.5rem;">
+                        <p><strong class="neon-gold">Vision:</strong> To become the global operating system for cinema craft.</p>
+                    </div>
+                    <div class="feature-box" style="text-align:left;padding:1.5rem;">
+                        <p><strong class="neon-cyan">Mission:</strong> Reduce friction in filmmaking, respect cultural storytelling, and empower creators worldwide.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -422,6 +445,32 @@
                 <span class="sprocket-hole"></span><span class="sprocket-hole"></span><span class="sprocket-hole"></span>
             </div>
         </div>
+
+        <!-- Feature Highlights -->
+        <section class="section" aria-label="Feature highlights">
+            <div class="container">
+                <div class="grid-3" aria-label="Platform features">
+                    <div class="feature-box border-gradient">
+                        <div class="feature-icon" aria-hidden="true">🎬</div>
+                        <span class="highlight-number" data-value="24" data-suffix="">24</span>
+                        <h3>Cinema Crafts</h3>
+                        <p class="small">Every craft from writing to distribution, organized and AI-powered.</p>
+                    </div>
+                    <div class="feature-box border-gradient">
+                        <div class="feature-icon" aria-hidden="true">🌍</div>
+                        <span class="highlight-number" data-value="50" data-suffix="+">50+</span>
+                        <h3>Languages</h3>
+                        <p class="small">Multilingual from day one. Local storytelling, global collaboration.</p>
+                    </div>
+                    <div class="feature-box border-gradient">
+                        <div class="feature-icon" aria-hidden="true">🤖</div>
+                        <span class="highlight-number" data-value="21" data-suffix="+">21+</span>
+                        <h3>AI Tools</h3>
+                        <p class="small">Purpose-built tools for every stage of the filmmaking pipeline.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <section class="section" aria-label="Call to action">
             <div class="container">
